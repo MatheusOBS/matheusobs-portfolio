@@ -1,27 +1,85 @@
-import React from 'react';
-import { PROFILE } from '../constants';
-import { Mail, MapPin, Send, Github, Linkedin, Instagram } from 'lucide-react';
+import React, { useState } from "react";
+import { PROFILE } from "../constants";
+import {
+  Mail,
+  MapPin,
+  Send,
+  Github,
+  Linkedin,
+  Instagram,
+  Loader2,
+  CheckCircle,
+  AlertCircle,
+} from "lucide-react";
+import { supabase } from "../services/supabaseClient";
 
 const Contact: React.FC = () => {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    message: "",
+  });
+  const [status, setStatus] = useState<
+    "idle" | "loading" | "success" | "error"
+  >("idle");
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.id]: e.target.value,
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.name || !formData.email || !formData.message) return;
+
+    setStatus("loading");
+
+    try {
+      const { error } = await supabase.from("contact_messages").insert([
+        {
+          name: formData.name,
+          email: formData.email,
+          message: formData.message,
+        },
+      ]);
+
+      if (error) throw error;
+
+      setStatus("success");
+      setFormData({ name: "", email: "", message: "" });
+      setTimeout(() => setStatus("idle"), 5000);
+    } catch (error) {
+      console.error("Error sending message:", error);
+      setStatus("error");
+    }
+  };
+
   return (
-    <section id="contact" className="py-24 bg-slate-900 relative overflow-hidden">
-       {/* Decorative Background */}
-       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-7xl opacity-30 pointer-events-none">
-            <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary-600/20 rounded-full blur-[100px]"></div>
-            <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-[100px]"></div>
-       </div>
+    <section
+      id="contact"
+      className="py-24 bg-slate-900 relative overflow-hidden"
+    >
+      {/* Decorative Background */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-7xl opacity-30 pointer-events-none">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary-600/20 rounded-full blur-[100px]"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-[100px]"></div>
+      </div>
 
       <div className="container mx-auto px-6 relative z-10">
         <div className="max-w-4xl mx-auto glass-panel rounded-3xl overflow-hidden shadow-2xl">
           <div className="grid grid-cols-1 md:grid-cols-2">
-            
             <div className="p-10 bg-primary-600 text-white flex flex-col justify-between">
               <div>
                 <h2 className="text-3xl font-bold mb-6">Vamos conversar?</h2>
                 <p className="text-primary-100 mb-8 leading-relaxed">
-                  Estou sempre aberto a novas oportunidades, colaborações ou apenas para trocar uma ideia sobre tecnologia.
+                  Estou sempre aberto a novas oportunidades, colaborações ou
+                  apenas para trocar uma ideia sobre tecnologia.
                 </p>
-                
+
                 <div className="space-y-6">
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-full bg-primary-500/50 flex items-center justify-center">
@@ -32,9 +90,9 @@ const Contact: React.FC = () => {
                       <p className="font-medium">{PROFILE.email}</p>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center gap-4">
-                     <div className="w-12 h-12 rounded-full bg-primary-500/50 flex items-center justify-center">
+                    <div className="w-12 h-12 rounded-full bg-primary-500/50 flex items-center justify-center">
                       <MapPin size={20} />
                     </div>
                     <div>
@@ -46,57 +104,126 @@ const Contact: React.FC = () => {
               </div>
 
               <div className="mt-12">
-                 <p className="text-sm text-primary-200 mb-4">Me encontre nas redes</p>
-                 <div className="flex gap-4">
-                    <a href={PROFILE.socials.github} target="_blank" rel="noreferrer" className="w-10 h-10 rounded-full border border-primary-400 flex items-center justify-center hover:bg-white hover:text-primary-600 transition-colors">
-                      <Github size={20} />
-                    </a>
-                    <a href={PROFILE.socials.linkedin} target="_blank" rel="noreferrer" className="w-10 h-10 rounded-full border border-primary-400 flex items-center justify-center hover:bg-white hover:text-primary-600 transition-colors">
-                      <Linkedin size={20} />
-                    </a>
-                    <a href={PROFILE.socials.instagram} target="_blank" rel="noreferrer" className="w-10 h-10 rounded-full border border-primary-400 flex items-center justify-center hover:bg-white hover:text-primary-600 transition-colors">
-                      <Instagram size={20} />
-                    </a>
-                 </div>
+                <p className="text-sm text-primary-200 mb-4">
+                  Me encontre nas redes
+                </p>
+                <div className="flex gap-4">
+                  <a
+                    href={PROFILE.socials.github}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="w-10 h-10 rounded-full border border-primary-400 flex items-center justify-center hover:bg-white hover:text-primary-600 transition-colors"
+                  >
+                    <Github size={20} />
+                  </a>
+                  <a
+                    href={PROFILE.socials.linkedin}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="w-10 h-10 rounded-full border border-primary-400 flex items-center justify-center hover:bg-white hover:text-primary-600 transition-colors"
+                  >
+                    <Linkedin size={20} />
+                  </a>
+                  <a
+                    href={PROFILE.socials.instagram}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="w-10 h-10 rounded-full border border-primary-400 flex items-center justify-center hover:bg-white hover:text-primary-600 transition-colors"
+                  >
+                    <Instagram size={20} />
+                  </a>
+                </div>
               </div>
             </div>
 
             <div className="p-10 bg-slate-900/50">
-              <form className="space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-slate-300 mb-2">Seu Nome</label>
-                  <input 
-                    type="text" 
-                    id="name" 
-                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary-500 transition-colors"
+                  <label
+                    htmlFor="name"
+                    className="block text-sm font-medium text-slate-300 mb-2"
+                  >
+                    Seu Nome
+                  </label>
+                  <input
+                    type="text"
+                    id="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    required
+                    disabled={status === "loading"}
+                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary-500 transition-colors disabled:opacity-50"
                     placeholder="João Silva"
                   />
                 </div>
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-2">Seu Email</label>
-                  <input 
-                    type="email" 
-                    id="email" 
-                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary-500 transition-colors"
+                  <label
+                    htmlFor="email"
+                    className="block text-sm font-medium text-slate-300 mb-2"
+                  >
+                    Seu Email
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                    disabled={status === "loading"}
+                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary-500 transition-colors disabled:opacity-50"
                     placeholder="joao@exemplo.com"
                   />
                 </div>
                 <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-slate-300 mb-2">Mensagem</label>
-                  <textarea 
-                    id="message" 
+                  <label
+                    htmlFor="message"
+                    className="block text-sm font-medium text-slate-300 mb-2"
+                  >
+                    Mensagem
+                  </label>
+                  <textarea
+                    id="message"
                     rows={4}
-                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary-500 transition-colors resize-none"
+                    value={formData.message}
+                    onChange={handleChange}
+                    required
+                    disabled={status === "loading"}
+                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary-500 transition-colors resize-none disabled:opacity-50"
                     placeholder="Olá, gostaria de falar sobre um projeto..."
                   ></textarea>
                 </div>
-                
-                <button type="submit" className="w-full bg-white text-slate-900 font-bold py-4 rounded-lg hover:bg-primary-50 transition-colors flex items-center justify-center gap-2">
-                  Enviar Mensagem <Send size={18} />
+
+                <button
+                  type="submit"
+                  disabled={status === "loading" || status === "success"}
+                  className={`w-full font-bold py-4 rounded-lg transition-colors flex items-center justify-center gap-2 ${
+                    status === "success"
+                      ? "bg-green-600 text-white cursor-default"
+                      : status === "error"
+                        ? "bg-red-600 text-white hover:bg-red-700"
+                        : "bg-white text-slate-900 hover:bg-primary-50"
+                  }`}
+                >
+                  {status === "loading" ? (
+                    <>
+                      Enviando... <Loader2 size={18} className="animate-spin" />
+                    </>
+                  ) : status === "success" ? (
+                    <>
+                      Mensagem Enviada! <CheckCircle size={18} />
+                    </>
+                  ) : status === "error" ? (
+                    <>
+                      Erro ao Enviar <AlertCircle size={18} />
+                    </>
+                  ) : (
+                    <>
+                      Enviar Mensagem <Send size={18} />
+                    </>
+                  )}
                 </button>
               </form>
             </div>
-
           </div>
         </div>
       </div>

@@ -43,7 +43,7 @@ export const PROJECTS: Project[] = [
       "Um agente profissional que atende seus clientes sozinho no WhatsApp. O Agente IA WhatsApp Pro entende áudios, imagens, vídeos e documentos, responde dúvidas, marca consultas, faz triagem e realiza atendimentos completos – como um atendente humano, só que 24/7.",
     tags: ["Node.js", "AI", "WhatsApp API"],
     link: "https://matheusobs.github.io/-Agente-IA-WhatsApp-Pro/",
-    github: "https://matheusobs.github.io/-Agente-IA-WhatsApp-Pro/",
+    github: "https://github.com/MatheusOBS/-Agente-IA-WhatsApp-Pro",
     image: "./agente-whatsapp.png",
   },
 ];
